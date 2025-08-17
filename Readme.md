@@ -1,6 +1,6 @@
-# Payslip Generation System
+# Mini Payroll System
 
-A scalable payslip generation system built with Go that handles employee attendance, overtime, and reimbursement tracking with automated payroll processing.
+A prototype payroll system built with Go that handles employee attendance, overtime, and reimbursement tracking with automated payroll processing.
 
 ## Features
 
@@ -34,7 +34,7 @@ A scalable payslip generation system built with Go that handles employee attenda
 
 ### Prerequisites
 
-- Go 1.21+
+- Go 1.23+
 - PostgreSQL 13+
 - Docker & Docker Compose (optional)
 
@@ -42,8 +42,8 @@ A scalable payslip generation system built with Go that handles employee attenda
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/payslip-system.git
-cd payslip-system
+git clone https://github.com/yourusername/mini-payroll.git
+cd mini-payroll
 ```
 
 2. **Set up environment variables**
@@ -179,15 +179,15 @@ Content-Type: application/json
 }
 ```
 
-#### Process Payroll
+#### Process Payslip
 ```http
-POST /api/v1/admin/payroll/{period_id}/process
+POST /api/v1/admin/payslip/{period_id}/process
 Authorization: Bearer {admin_token}
 ```
 
-#### Generate Payroll Summary
+#### Generate Payslip Summary
 ```http
-GET /api/v1/admin/payroll/{period_id}/summary
+GET /api/v1/admin/payslip/{period_id}/summary
 Authorization: Bearer {admin_token}
 ```
 
@@ -210,12 +210,12 @@ Authorization: Bearer {admin_token}
 ### Key Tables
 
 - **users**: Employee and admin information
-- **attendance_periods**: Payroll periods set by admin
+- **attendance_periods**: Payslip periods set by admin
 - **attendances**: Daily attendance records
 - **overtimes**: Overtime work records
 - **reimbursements**: Expense reimbursement requests
-- **payrolls**: Processed payroll summaries
-- **payroll_items**: Individual employee payroll calculations
+- **payslips**: Processed payslip summaries
+- **payslip_items**: Individual employee payslip calculations
 - **audit_logs**: Complete audit trail
 
 ### Relationships
@@ -224,14 +224,14 @@ Authorization: Bearer {admin_token}
 users (1) ──→ (N) attendances
 users (1) ──→ (N) overtimes
 users (1) ──→ (N) reimbursements
-users (1) ──→ (N) payroll_items
+users (1) ──→ (N) payslip_items
 
 attendance_periods (1) ──→ (N) attendances
 attendance_periods (1) ──→ (N) overtimes
 attendance_periods (1) ──→ (N) reimbursements
-attendance_periods (1) ──→ (1) payrolls
+attendance_periods (1) ──→ (1) payslips
 
-payrolls (1) ──→ (N) payroll_items
+payslips (1) ──→ (N) payslip_items
 ```
 
 ## Business Rules
@@ -286,11 +286,11 @@ make test-all
 ```
 === RUN   TestAuthService_Login
 === RUN   TestAttendanceService_SubmitAttendance
-=== RUN   TestPayrollService_GeneratePayslip
+=== RUN   TestPayslipService_GeneratePayslip
 --- PASS: All tests (2.34s)
 
 BenchmarkLogin-8                 1000    1.2ms per operation
-BenchmarkPayslipGeneration-8     500     2.4ms per operation
+BenchmarkPayrollGeneration-8     500     2.4ms per operation
 ```
 
 ## Performance & Scalability
@@ -336,7 +336,7 @@ Every record includes:
 ### Docker Deployment
 ```bash
 # Build image
-docker build -t payslip-system:latest .
+docker build -t mini-payroll:latest .
 
 # Deploy with compose
 docker-compose -f docker-compose.prod.yml up -d
