@@ -1,0 +1,44 @@
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: payslip_db
+      POSTGRES_USER: payslip_user
+      POSTGRES_PASSWORD: payslip_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  postgres_test:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: payslip_test_db
+      POSTGRES_USER: payslip_user
+      POSTGRES_PASSWORD: payslip_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://payslip_user:payslip_password@postgres:5432/payslip_db?sslmode=disable
+      JWT_SECRET: your-super-secret-jwt-key
+      SEED_DATABASE: "true"
+      ENVIRONMENT: production
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  postgres_data:
+  postgres_test_data:

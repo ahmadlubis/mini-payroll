@@ -1,0 +1,33 @@
+
+# Payslip System Configuration
+
+# Database connection string (takes precedence over individual database settings)
+database_url: "postgres://payslip_user:payslip_password@localhost:5433/payslip_test_db?sslmode=disable"
+
+# JWT Secret for token signing
+jwt_secret: "your-super-secret-jwt-key-change-in-production"
+
+# Whether to seed the database with initial data
+seed_database: true
+
+# Application environment
+environment: "development"
+
+# Log level (debug, info, warn, error)
+log_level: "info"
+
+# Server configuration
+server:
+  host: "localhost"
+  port: 8080
+  read_timeout: 30   # seconds
+  write_timeout: 30  # seconds
+
+# Database configuration (used if database_url is not set)
+database:
+  host: "localhost"
+  port: 5433
+  user: "payslip_user"
+  password: "payslip_password"
+  dbname: "payslip_test_db"
+  sslmode: "disable"
