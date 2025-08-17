@@ -5,17 +5,17 @@ import (
 	"time"
 
 	"payslip-system/internal/models"
-	"payslip-system/internal/test"
+	"payslip-system/tests"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestPayrollService_GeneratePayslip(t *testing.T) {
-	db, cleanup := test.SetupTestDB()
+func TestPerformancePayrollServiceGeneratePayslip(t *testing.T) {
+	db, cleanup := tests.SetupTestDB()
 	defer cleanup()
 
-	repos, services := test.SetupTestServices(db)
+	repos, services := tests.SetupTestServices(db)
 
 	// Create test user
 	testUser := &models.User{

@@ -5,17 +5,17 @@ import (
 	"time"
 
 	"payslip-system/internal/middleware"
-	"payslip-system/internal/service"
+	"payslip-system/internal/providers"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 type Handlers struct {
-	services *service.Services
+	services *providers.Services
 }
 
-func NewHandlers(services *service.Services) *Handlers {
+func NewHandlers(services *providers.Services) *Handlers {
 	return &Handlers{services: services}
 }
 

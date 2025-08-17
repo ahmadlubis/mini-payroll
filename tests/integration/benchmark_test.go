@@ -10,7 +10,7 @@ import (
 
 	"payslip-system/internal/controllers/api"
 	"payslip-system/internal/models"
-	"payslip-system/internal/test"
+	test "payslip-system/tests"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

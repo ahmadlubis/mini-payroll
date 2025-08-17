@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"payslip-system/internal/domains"
 	"payslip-system/internal/models"
 	"payslip-system/internal/repository"
 	"time"
@@ -10,46 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type PayrollService interface {
-	GeneratePayslip(userID, periodID uuid.UUID) (*PayslipResponse, error)
-	GeneratePayrollSummary(periodID uuid.UUID) (*PayrollSummaryResponse, error)
-	ProcessPayroll(periodID, adminID uuid.UUID, ipAddress, requestID string) error
-}
-
-type PayslipResponse struct {
-	Employee            *models.User             `json:"employee"`
-	Period              *models.AttendancePeriod `json:"period"`
-	BaseSalary          float64                  `json:"base_salary"`
-	AttendanceDays      int                      `json:"attendance_days"`
-	WorkingDays         int                      `json:"working_days"`
-	AttendanceAmount    float64                  `json:"attendance_amount"`
-	OvertimeHours       float64                  `json:"overtime_hours"`
-	OvertimeAmount      float64                  `json:"overtime_amount"`
-	Reimbursements      []models.Reimbursement   `json:"reimbursements"`
-	ReimbursementAmount float64                  `json:"reimbursement_amount"`
-	TotalAmount         float64                  `json:"total_amount"`
-}
-
-type PayrollSummaryResponse struct {
-	Period      *models.AttendancePeriod `json:"period"`
-	Employees   []EmployeeSummary        `json:"employees"`
-	TotalAmount float64                  `json:"total_amount"`
-}
-
-type EmployeeSummary struct {
-	Employee    *models.User `json:"employee"`
-	TotalAmount float64      `json:"total_amount"`
-}
-
 type payrollService struct {
 	repos *repository.Repositories
 }
 
-func NewPayrollService(repos *repository.Repositories) PayrollService {
+func NewPayrollService(repos *repository.Repositories) *payrollService {
 	return &payrollService{repos: repos}
 }
 
-func (s *payrollService) GeneratePayslip(userID, periodID uuid.UUID) (*PayslipResponse, error) {
+func (s *payrollService) GeneratePayslip(userID, periodID uuid.UUID) (*domains.PayslipResponse, error) {
 	// Get user
 	user, err := s.repos.User.GetByID(userID)
 	if err != nil {
@@ -76,7 +46,7 @@ func (s *payrollService) GeneratePayslip(userID, periodID uuid.UUID) (*PayslipRe
 		// Get reimbursements
 		reimbursements, _ := s.repos.Reimbursement.GetByUserAndPeriod(userID, periodID)
 
-		return &PayslipResponse{
+		return &domains.PayslipResponse{
 			Employee:            user,
 			Period:              period,
 			BaseSalary:          item.BaseSalary,
@@ -95,7 +65,7 @@ func (s *payrollService) GeneratePayslip(userID, periodID uuid.UUID) (*PayslipRe
 	return s.calculatePayslip(user, period)
 }
 
-func (s *payrollService) calculatePayslip(user *models.User, period *models.AttendancePeriod) (*PayslipResponse, error) {
+func (s *payrollService) calculatePayslip(user *models.User, period *models.AttendancePeriod) (*domains.PayslipResponse, error) {
 	// Get attendance records
 	attendances, _ := s.repos.Attendance.GetByUserAndPeriod(user.ID, period.ID)
 	attendanceDays := len(attendances)
@@ -129,7 +99,7 @@ func (s *payrollService) calculatePayslip(user *models.User, period *models.Atte
 	// Calculate total
 	totalAmount := attendanceAmount + overtimeAmount + reimbursementAmount
 
-	return &PayslipResponse{
+	return &domains.PayslipResponse{
 		Employee:            user,
 		Period:              period,
 		BaseSalary:          baseSalary,
@@ -144,7 +114,7 @@ func (s *payrollService) calculatePayslip(user *models.User, period *models.Atte
 	}, nil
 }
 
-func (s *payrollService) GeneratePayrollSummary(periodID uuid.UUID) (*PayrollSummaryResponse, error) {
+func (s *payrollService) GeneratePayrollSummary(periodID uuid.UUID) (*domains.PayrollSummaryResponse, error) {
 	// Get period
 	period, err := s.repos.AttendancePeriod.GetByID(periodID)
 	if err != nil {
@@ -157,7 +127,7 @@ func (s *payrollService) GeneratePayrollSummary(periodID uuid.UUID) (*PayrollSum
 		return nil, fmt.Errorf("failed to get employees: %w", err)
 	}
 
-	var employeeSummaries []EmployeeSummary
+	var employeeSummaries []domains.EmployeeSummary
 	var totalAmount float64
 
 	for _, employee := range employees {
@@ -167,7 +137,7 @@ func (s *payrollService) GeneratePayrollSummary(periodID uuid.UUID) (*PayrollSum
 			if err != nil {
 				continue // Skip if no payroll item found
 			}
-			employeeSummaries = append(employeeSummaries, EmployeeSummary{
+			employeeSummaries = append(employeeSummaries, domains.EmployeeSummary{
 				Employee:    &employee,
 				TotalAmount: item.TotalAmount,
 			})
@@ -178,7 +148,7 @@ func (s *payrollService) GeneratePayrollSummary(periodID uuid.UUID) (*PayrollSum
 			if err != nil {
 				continue
 			}
-			employeeSummaries = append(employeeSummaries, EmployeeSummary{
+			employeeSummaries = append(employeeSummaries, domains.EmployeeSummary{
 				Employee:    &employee,
 				TotalAmount: payslip.TotalAmount,
 			})
@@ -186,7 +156,7 @@ func (s *payrollService) GeneratePayrollSummary(periodID uuid.UUID) (*PayrollSum
 		}
 	}
 
-	return &PayrollSummaryResponse{
+	return &domains.PayrollSummaryResponse{
 		Period:      period,
 		Employees:   employeeSummaries,
 		TotalAmount: totalAmount,
@@ -300,8 +270,8 @@ func (s *payrollService) ProcessPayroll(periodID, adminID uuid.UUID, ipAddress, 
 	}
 
 	// Create audit logs
-	s.createAuditLog("payrolls", payroll.ID, "INSERT", nil, payroll, &adminID, ipAddress, requestID)
-	s.createAuditLog("attendance_periods", period.ID, "UPDATE", nil, period, &adminID, ipAddress, requestID)
+	createAuditLog("payrolls", payroll.ID, "INSERT", nil, payroll, &adminID, ipAddress, requestID, s.repos)
+	createAuditLog("attendance_periods", period.ID, "UPDATE", nil, period, &adminID, ipAddress, requestID, s.repos)
 
 	return nil
 }

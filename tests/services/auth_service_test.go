@@ -2,7 +2,7 @@ package service_test
 
 import (
 	"payslip-system/internal/models"
-	"payslip-system/internal/test"
+	"payslip-system/tests"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,11 +10,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func TestAuthService_Login(t *testing.T) {
-	db, cleanup := test.SetupTestDB()
+func TestPerformanceAuthServiceLogin(t *testing.T) {
+	db, cleanup := tests.SetupTestDB()
 	defer cleanup()
 
-	repos, services := test.SetupTestServices(db)
+	repos, services := tests.SetupTestServices(db)
 
 	// Create test user
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)

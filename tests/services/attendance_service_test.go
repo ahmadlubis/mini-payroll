@@ -5,18 +5,18 @@ import (
 	"time"
 
 	"payslip-system/internal/models"
-	"payslip-system/internal/test"
+	"payslip-system/tests"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestAttendanceService_SubmitAttendance(t *testing.T) {
-	db, cleanup := test.SetupTestDB()
+func TestPerformanceSubmitAttendanceService(t *testing.T) {
+	db, cleanup := tests.SetupTestDB()
 	defer cleanup()
 
-	repos, services := test.SetupTestServices(db)
+	repos, services := tests.SetupTestServices(db)
 
 	// Create test user
 	testUser := &models.User{

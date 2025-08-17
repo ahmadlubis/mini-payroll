@@ -1,12 +1,12 @@
-package test
+package tests
 
 import (
 	"log"
 
 	"payslip-system/internal/config"
 	"payslip-system/internal/database"
+	"payslip-system/internal/providers"
 	"payslip-system/internal/repository"
-	"payslip-system/internal/service"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -53,8 +53,8 @@ func SetupTestDB() (*gorm.DB, func()) {
 	return db, cleanup
 }
 
-func SetupTestServices(db *gorm.DB) (*repository.Repositories, *service.Services) {
+func SetupTestServices(db *gorm.DB) (*repository.Repositories, *providers.Services) {
 	repos := repository.NewRepositories(db)
-	services := service.NewServices(repos)
+	services := providers.NewServices(repos)
 	return repos, services
 }

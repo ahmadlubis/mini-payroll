@@ -8,17 +8,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// AuthService
-type AuthService interface {
-	Login(username, password string) (*models.User, string, error)
-	ValidateToken(tokenString string) (*models.User, error)
-}
-
 type authService struct {
 	repos *repository.Repositories
 }
 
-func NewAuthService(repos *repository.Repositories) AuthService {
+func NewAuthService(repos *repository.Repositories) *authService {
 	return &authService{repos: repos}
 }
 

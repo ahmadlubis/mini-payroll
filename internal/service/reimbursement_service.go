@@ -9,15 +9,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type ReimbursementService interface {
-	SubmitReimbursement(userID uuid.UUID, amount float64, description, ipAddress, requestID string) error
-}
-
 type reimbursementService struct {
 	repos *repository.Repositories
 }
 
-func NewReimbursementService(repos *repository.Repositories) ReimbursementService {
+func NewReimbursementService(repos *repository.Repositories) *reimbursementService {
 	return &reimbursementService{repos: repos}
 }
 

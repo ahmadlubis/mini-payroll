@@ -10,15 +10,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type AdminService interface {
-	CreateAttendancePeriod(startDate, endDate time.Time, adminID uuid.UUID, ipAddress, requestID string) (*models.AttendancePeriod, error)
-}
-
 type adminService struct {
 	repos *repository.Repositories
 }
 
-func NewAdminService(repos *repository.Repositories) AdminService {
+func NewAdminService(repos *repository.Repositories) *adminService {
 	return &adminService{repos: repos}
 }
 

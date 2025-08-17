@@ -10,15 +10,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type AttendanceService interface {
-	SubmitAttendance(userID uuid.UUID, date time.Time, checkInTime time.Time, ipAddress, requestID string) error
-}
-
 type attendanceService struct {
 	repos *repository.Repositories
 }
 
-func NewAttendanceService(repos *repository.Repositories) AttendanceService {
+func NewAttendanceService(repos *repository.Repositories) *attendanceService {
 	return &attendanceService{repos: repos}
 }
 

@@ -2,13 +2,13 @@ package api
 
 import (
 	"payslip-system/internal/middleware"
+	"payslip-system/internal/providers"
 	"payslip-system/internal/repository"
-	"payslip-system/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, services *service.Services) {
+func SetupRoutes(r *gin.Engine, services *providers.Services) {
 	handlers := NewHandlers(services)
 
 	// Get repository for middleware (needed for auth middleware)
@@ -47,7 +47,7 @@ func SetupRoutes(r *gin.Engine, services *service.Services) {
 }
 
 // SetupRoutesWithRepos is a helper function that accepts repositories
-func SetupRoutesWithRepos(r *gin.Engine, services *service.Services, repos *repository.Repositories) {
+func SetupRoutesWithRepos(r *gin.Engine, services *providers.Services, repos *repository.Repositories) {
 	handlers := NewHandlers(services)
 
 	// Public routes

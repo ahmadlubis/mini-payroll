@@ -8,8 +8,8 @@ import (
 	"payslip-system/internal/controllers/api"
 	"payslip-system/internal/database"
 	"payslip-system/internal/middleware"
+	"payslip-system/internal/providers"
 	"payslip-system/internal/repository"
-	"payslip-system/internal/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -39,7 +39,7 @@ func main() {
 	repos := repository.NewRepositories(db)
 
 	// Initialize services
-	services := service.NewServices(repos)
+	services := providers.NewServices(repos)
 
 	// Initialize Gin router
 	r := gin.New()

@@ -10,16 +10,11 @@ import (
 	"github.com/google/uuid"
 )
 
-// OvertimeService
-type OvertimeService interface {
-	SubmitOvertime(userID uuid.UUID, date time.Time, hours float64, ipAddress, requestID string) error
-}
-
 type overtimeService struct {
 	repos *repository.Repositories
 }
 
-func NewOvertimeService(repos *repository.Repositories) OvertimeService {
+func NewOvertimeService(repos *repository.Repositories) *overtimeService {
 	return &overtimeService{repos: repos}
 }
 
